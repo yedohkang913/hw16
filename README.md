@@ -1,1 +1,3 @@
 # hw16
+
+## note that it may only work on Macs...
