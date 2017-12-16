@@ -11,6 +11,7 @@
   returns the file descriptor for the upstream pipe.
   =========================*/
 int server_handshake(int *to_client) {
+  /*
   char * toClnt = "/toClnt";
   char * toSrv = "/toSrv";
   char * toChck = "/toChck";
@@ -41,6 +42,24 @@ int server_handshake(int *to_client) {
     }
     return 0;
   }
+  */
+  int from_client;
+  char buffer[1000];
+  mkfifo("luigi", 0600);
+
+  //print
+  from_client = open("luigi", O_RDONLY, 0);
+  read(from_client, buffer, sizeof(buffer));
+  //print
+  remove("luigi");
+  //print
+
+  *to_client = open(buffer, O_WRONLY, 0);
+  write(*to_client, buffer, sizeof(buffer));
+
+  read(from_client, buffer, sizeof(buffer));
+  //print
+  return from_client;
 }
 
 
@@ -54,6 +73,7 @@ int server_handshake(int *to_client) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int *to_server) {
+  /*
   char * toClnt = "/toClnt";
   char * toSrv = "/toSrv";
   char * toChck = "/toChck";
@@ -83,4 +103,26 @@ int client_handshake(int *to_server) {
     } 
   }
   return 0;
+  */
+  int from_server;
+  char buffer[1000];
+
+  //print
+  *to_server = open("luigi", O_WRONLY, 0);
+
+  sprintf(buffer, "%d", getpid());
+  mkfifo(buffer, 0600);
+
+  write(*to_server, buffer, sizeof(buffer));
+
+  from_server = open(buffer, O_RDONLY, 0);
+  read(from_server, buffer, sizeof(buffer));
+  //print
+
+  remove(buffer);
+  //print
+
+  write(*to_server, ACK, sizeof(buffer));
+
+  return from_server;
 }
